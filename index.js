@@ -2,6 +2,7 @@ import express from 'express';
 import connectDB from './db.js'; 
 import User from './src/models/User.js'; // مدل User
 import Question from './src/models/Question.js'; // مدل Qustion
+import Answer from './src/models/Answer.js'; // مدل Answer
 
 const app = express();
 const PORT = 3000;
@@ -78,6 +79,29 @@ app.get('/questions/:id', async (req, res) => {
     const question = await Question.findById(req.params.id).populate('userId', 'username email');
     if (!question) return res.status(404).json({ error: 'Question not found' });
     res.json(question);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+//Answer
+// 📌 ثبت پاسخ جدید
+app.post('/answers', async (req, res) => {
+  try {
+    const answer = new Answer(req.body);
+    await answer.save();
+    res.status(201).json(answer);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// 📌 گرفتن همه جواب‌های یک سوال خاص
+app.get('/answers/:questionId', async (req, res) => {
+  try {
+    const answers = await Answer.find({ questionId: req.params.questionId })
+      .populate('userId', 'username email');
+    res.json(answers);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
