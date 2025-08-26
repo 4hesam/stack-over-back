@@ -1,44 +1,54 @@
 import mongoose from 'mongoose';
 
-// Create a schema for the Question model.
 const QuestionSchema = new mongoose.Schema({
-  // The author of the question, referencing the 'User' model.
   author: {
-    type: mongoose.Schema.Types.ObjectId, // The type is a MongoDB document ID.
-    ref: 'User', // References the 'User' model.
-    required: true, // This field is mandatory.
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
   },
-  // The title of the question.
   title: {
     type: String,
-    required: true,
+    required: [true, 'Title is required'],
+    trim: true,
+    minlength: 10,
+    maxlength: 150,
   },
-  // The main content of the question.
   content: {
     type: String,
-    required: true,
+    required: [true, 'Content is required'],
+    minlength: 20,
   },
-  // An array to store embedded votes for this question.
+  tags: [{
+    type: String,
+    trim: true,
+    lowercase: true,
+  }],
   votes: [{
-    // The user who cast the vote.
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
-    // The type of vote (e.g., 'upvote' or 'downvote').
     type: {
       type: String,
-      enum: ['upvote', 'downvote'], // Only these two values are allowed.
+      enum: ['upvote', 'downvote'],
       required: true,
     },
   }],
-  // An array of IDs of the answers related to this question.
   answers: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Answer', // References the 'Answer' model.
+    ref: 'Answer',
   }],
-  // The timestamp when the question was created.
+  acceptedAnswer: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Answer',
+    default: null,
+  },
+  views: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -46,5 +56,4 @@ const QuestionSchema = new mongoose.Schema({
 });
 
 const Question = mongoose.model('Question', QuestionSchema);
-
 export default Question;

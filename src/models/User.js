@@ -1,33 +1,42 @@
 import mongoose from 'mongoose';
 
 const UserSchema = new mongoose.Schema({
-  // Unique username for the user.
   username: {
     type: String,
-    required: true, // This field is mandatory.
-    unique: true,   // Username must be unique across all users.
-    trim: true,     // Removes whitespace from the beginning and end.
+    required: [true, 'Username is required'],
+    unique: true,
+    trim: true,
+    minlength: 3,
+    maxlength: 30,
   },
-  // Hashed password for security.
-  password: {
-    type: String,
-    required: true, // This field is mandatory.
-  },
-  // Email address, also unique.
   email: {
     type: String,
-    required: true, // This field is mandatory.
-    unique: true,   // Email must be unique across all users.
+    required: [true, 'Email is required'],
+    unique: true,
     trim: true,
-    lowercase: true, // Stores the email in lowercase.
+    lowercase: true,
+    match: [/^\S+@\S+\.\S+$/, 'Invalid email format'],
   },
-  // Timestamp for when the user was created.
+  password: {
+    type: String,
+    required: [true, 'Password is required'],
+    minlength: 6, // max password
+  },
+  bio: {
+    type: String,
+    default: '',
+    maxlength: 200,
+  },
+  reputation: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
   createdAt: {
     type: Date,
-    default: Date.now, // Automatically sets the current date.
+    default: Date.now,
   },
 });
 
 const User = mongoose.model('User', UserSchema);
-
 export default User;
